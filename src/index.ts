@@ -1,3 +1,4 @@
+require('dotenv').config()
 import { WebhookClient, MessageEmbed } from 'discord.js';
 import fetch from 'node-fetch';
 import { StatusPageIncident, StatusPageResult } from './interfaces/StatusPage';
@@ -12,7 +13,7 @@ import {
 	API_BASE,
 } from './constants';
 import { logger } from './logger';
-const incidentData: Keyv<DataEntry> = new Keyv(`sqlite:///data/data.sqlite`);
+const incidentData: Keyv<DataEntry> = new Keyv(`sqlite://data/data.sqlite`);
 
 interface DataEntry {
 	messageID: string;
@@ -21,7 +22,7 @@ interface DataEntry {
 	resolved: boolean;
 }
 
-const hook = new WebhookClient(process.env.DISCORD_WEBHOOK_ID!, process.env.DISCORD_WEBHOOK_TOKEN!);
+const hook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK! });
 logger.info(`Starting with ${hook.id}`);
 
 function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
@@ -43,7 +44,7 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 		.setTimestamp(new Date(incident.started_at))
 		.setURL(incident.shortlink)
 		.setTitle(incident.name)
-		.setFooter(incident.id);
+		.setFooter({text: incident.id});
 
 	for (const update of incident.incident_updates.reverse()) {
 		const updateDT = DateTime.fromISO(update.created_at);
@@ -65,7 +66,7 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 async function updateIncident(incident: StatusPageIncident, messageID?: string) {
 	const embed = embedFromIncident(incident);
 	try {
-		const message = await (messageID ? hook.editMessage(messageID, embed) : hook.send(embed));
+		const message = await (messageID ? hook.editMessage(messageID, { embeds: [embed] }) : hook.send({ embeds: [embed] }));
 		logger.debug(`setting: ${incident.id} to message: ${message.id}`);
 		await incidentData.set(incident.id, {
 			incidentID: incident.id,
@@ -75,10 +76,10 @@ async function updateIncident(incident: StatusPageIncident, messageID?: string) 
 		});
 	} catch (error) {
 		if (messageID) {
-			logger.error(`error during hook update on incident ${incident.id} message: ${messageID}\n`, error);
+			console.error(`error during hook update on incident ${incident.id} message: ${messageID}\n`, error);
 			return;
 		}
-		logger.error(`error during hook sending on incident ${incident.id}\n`, error);
+		console.error(`error during hook sending on incident ${incident.id}\n`, error);
 	}
 }
 
@@ -103,7 +104,7 @@ async function check() {
 			}
 		}
 	} catch (error) {
-		logger.error(`error during fetch and update routine:\n`, error);
+		console.error(`error during fetch and update routine:\n`, error);
 	}
 }
 
