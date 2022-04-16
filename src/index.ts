@@ -12,7 +12,6 @@ import {
 	EMBED_COLOR_BLACK,
 	API_BASE,
 } from './constants';
-import { logger } from './logger';
 const incidentData: Keyv<DataEntry> = new Keyv(`sqlite://data/data.sqlite`);
 
 interface DataEntry {
@@ -23,7 +22,7 @@ interface DataEntry {
 }
 
 const hook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK! });
-logger.info(`Starting with ${hook.id}`);
+console.info(`Starting with webhook ${hook.id}`);
 
 function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 	const color =
@@ -67,7 +66,7 @@ async function updateIncident(incident: StatusPageIncident, messageID?: string) 
 	const embed = embedFromIncident(incident);
 	try {
 		const message = await (messageID ? hook.editMessage(messageID, { embeds: [embed] }) : hook.send({ embeds: [embed] }));
-		logger.debug(`setting: ${incident.id} to message: ${message.id}`);
+		console.debug(`setting: ${incident.id} to message: ${message.id}`);
 		await incidentData.set(incident.id, {
 			incidentID: incident.id,
 			lastUpdate: DateTime.now().toISO(),
@@ -84,7 +83,7 @@ async function updateIncident(incident: StatusPageIncident, messageID?: string) 
 }
 
 async function check() {
-	logger.info('heartbeat');
+	//console.info('heartbeat');
 	try {
 		const json = (await fetch(`${API_BASE}/incidents.json`).then((r) => r.json())) as StatusPageResult;
 		const { incidents } = json;
@@ -92,14 +91,14 @@ async function check() {
 		for (const incident of incidents.reverse()) {
 			const data = await incidentData.get(incident.id);
 			if (!data) {
-				logger.info(`new incident: ${incident.id}`);
+				console.info(`new incident: ${incident.id}`);
 				void updateIncident(incident);
 				continue;
 			}
 
 			const incidentUpdate = DateTime.fromISO(incident.updated_at ?? incident.created_at);
 			if (DateTime.fromISO(data.lastUpdate) < incidentUpdate) {
-				logger.info(`update incident: ${incident.id}`);
+				console.info(`update incident: ${incident.id}`);
 				void updateIncident(incident, data.messageID);
 			}
 		}
