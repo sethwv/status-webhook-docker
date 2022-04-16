@@ -48,7 +48,7 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 	for (const update of incident.incident_updates.reverse()) {
 		const updateDT = DateTime.fromISO(update.created_at);
 		const timeString = `<t:${Math.floor(updateDT.toSeconds())}:R>`;
-		embed.addField(`${update.status.charAt(0).toUpperCase()}${update.status.slice(1)} (${timeString})`, update.body);
+		embed.addField(`${update.status.charAt(0).toUpperCase()}${update.status.slice(1)} ${timeString}`, update.body);
 	}
 
 	const descriptionParts = [`• Impact: ${incident.impact}`];
