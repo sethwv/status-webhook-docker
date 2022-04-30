@@ -1,4 +1,4 @@
-export const API_BASE = 'https://discordstatus.com/api/v2/';
+export const API_BASE = 'https://discordstatus.com/api/v2';
 export const EMBED_COLOR_GREEN = '#43b581';
 export const EMBED_COLOR_YELLOW = '#faa61a';
 export const EMBED_COLOR_ORANGE = '#f26522';
