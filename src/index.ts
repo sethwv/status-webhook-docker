@@ -2,7 +2,6 @@ require('dotenv').config()
 import { WebhookClient, MessageEmbed } from 'discord.js';
 import fetch from 'node-fetch';
 import { StatusPageIncident, StatusPageResult } from './interfaces/StatusPage';
-import { DateTime } from 'luxon';
 import Keyv from 'keyv';
 import {
 	EMBED_COLOR_GREEN,
@@ -17,7 +16,7 @@ const incidentData: Keyv<DataEntry> = new Keyv(`sqlite://data/data.sqlite`);
 interface DataEntry {
 	messageID: string;
 	incidentID: string;
-	lastUpdate: string;
+	lastUpdate: any;
 	resolved: boolean;
 }
 
@@ -46,8 +45,8 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 		.setFooter({text: incident.id});
 
 	for (const update of incident.incident_updates.reverse()) {
-		const updateDT = DateTime.fromISO(update.created_at);
-		const timeString = `<t:${Math.floor(updateDT.toSeconds())}:R>`;
+		const updateDT = new Date(update.created_at);
+		const timeString = `<t:${Math.floor(toSeconds(updateDT))}:R>`;
 		embed.addField(`${update.status.charAt(0).toUpperCase()}${update.status.slice(1)} ${timeString}`, update.body);
 	}
 
@@ -69,7 +68,7 @@ async function updateIncident(incident: StatusPageIncident, messageID?: string) 
 		console.debug(`setting: ${incident.id} to message: ${message.id}`);
 		await incidentData.set(incident.id, {
 			incidentID: incident.id,
-			lastUpdate: DateTime.now().toISO(),
+			lastUpdate: new Date(),
 			messageID: message.id,
 			resolved: incident.status === 'resolved' || incident.status === 'postmortem',
 		});
@@ -96,8 +95,8 @@ async function check() {
 				continue;
 			}
 
-			const incidentUpdate = DateTime.fromISO(incident.updated_at ?? incident.created_at);
-			if (DateTime.fromISO(data.lastUpdate) < incidentUpdate) {
+			const incidentUpdate = incident.updated_at ?? incident.created_at;
+			if (data.lastUpdate < incidentUpdate) {
 				console.info(`update incident: ${incident.id}`);
 				void updateIncident(incident, data.messageID);
 			}
@@ -105,6 +104,10 @@ async function check() {
 	} catch (error) {
 		console.error(`error during fetch and update routine:\n`, error);
 	}
+}
+
+function toSeconds(date: any){ 
+	return Math.floor( date / 1000 ); 
 }
 
 void check();
