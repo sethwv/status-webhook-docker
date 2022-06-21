@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 import { WebhookClient, MessageEmbed } from 'discord.js';
 import fetch from 'node-fetch';
 import { StatusPageIncident, StatusPageResult } from './interfaces/StatusPage';
@@ -43,7 +43,7 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 		.setTimestamp(new Date(incident.started_at))
 		.setURL(incident.shortlink)
 		.setTitle(incident.name)
-		.setFooter({text: incident.id});
+		.setFooter({ text: incident.id });
 
 	for (const update of incident.incident_updates.reverse()) {
 		const updateDT = DateTime.fromISO(update.created_at);
@@ -65,7 +65,9 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 async function updateIncident(incident: StatusPageIncident, messageID?: string) {
 	const embed = embedFromIncident(incident);
 	try {
-		const message = await (messageID ? hook.editMessage(messageID, { embeds: [embed] }) : hook.send({ embeds: [embed] }));
+		const message = await (messageID
+			? hook.editMessage(messageID, { embeds: [embed] })
+			: hook.send({ embeds: [embed] }));
 		console.debug(`setting: ${incident.id} to message: ${message.id}`);
 		await incidentData.set(incident.id, {
 			incidentID: incident.id,
