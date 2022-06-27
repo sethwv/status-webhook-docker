@@ -14,8 +14,8 @@ pids
 # Env
 .env
 
-# Dist
-dist/
+# Build
+build/
 typings/
 docs/
 

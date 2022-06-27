@@ -10,7 +10,7 @@
 		"removeComments": false,
 		"alwaysStrict": true,
 		"pretty": true,
-		"outDir": "dist",
+		"outDir": "./build",
 		"incremental": true,
 		"noEmitHelpers": true,
 		"importHelpers": true,
