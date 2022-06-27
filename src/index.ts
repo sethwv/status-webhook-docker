@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import { StatusPageIncident, StatusPageResult } from './interfaces/StatusPage';
 import { DateTime } from 'luxon';
 import Keyv from 'keyv';
+import { appendFile, existsSync, mkdirSync } from 'fs';
 import {
 	EMBED_COLOR_GREEN,
 	EMBED_COLOR_RED,
@@ -23,6 +24,14 @@ interface DataEntry {
 
 const hook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK! });
 console.info(`Starting with webhook ${hook.id}`);
+
+if (!existsSync('./data')) {
+	console.info('Creating Database file');
+    mkdirSync('./data');
+	appendFile('data.sqlite', '', function (err) {
+		if (err) throw err;
+	});
+}
 
 function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 	const color =
