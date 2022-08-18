@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"description": "",
 	"contributors": [
-		"Souji <timoqueezle@gmail.com>"
+		"Souji <timoqueezle@gmail.com>",
+		"RobertR11"
 	],
 	"license": "Apache-2.0",
 	"private": true,
