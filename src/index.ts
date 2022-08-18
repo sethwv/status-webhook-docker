@@ -1,5 +1,6 @@
 require('dotenv').config();
-import { WebhookClient, MessageEmbed } from 'discord.js';
+import { WebhookClient, EmbedBuilder } from 'discord.js';
+// fuck you typescript for forcing me to still use this
 import fetch from 'node-fetch';
 import { StatusPageIncident, StatusPageResult } from './interfaces/StatusPage';
 import { DateTime } from 'luxon';
@@ -33,7 +34,7 @@ if (!existsSync('./data')) {
 	});
 }
 
-function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
+function embedFromIncident(incident: StatusPageIncident): EmbedBuilder {
 	const color =
 		incident.status === 'resolved' || incident.status === 'postmortem'
 			? EMBED_COLOR_GREEN
@@ -47,7 +48,7 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 
 	const affectedNames = incident.components.map((c) => c.name);
 
-	const embed = new MessageEmbed()
+	const embed = new EmbedBuilder()
 		.setColor(color)
 		.setTimestamp(new Date(incident.started_at))
 		.setURL(incident.shortlink)
@@ -57,7 +58,7 @@ function embedFromIncident(incident: StatusPageIncident): MessageEmbed {
 	for (const update of incident.incident_updates.reverse()) {
 		const updateDT = DateTime.fromISO(update.created_at);
 		const timeString = `<t:${Math.floor(updateDT.toSeconds())}:R>`;
-		embed.addField(`${update.status.charAt(0).toUpperCase()}${update.status.slice(1)} ${timeString}`, update.body);
+		embed.addFields({ name: `${update.status.charAt(0).toUpperCase()}${update.status.slice(1)} ${timeString}`, value: update.body });
 	}
 
 	const descriptionParts = [`• Impact: ${incident.impact}`];

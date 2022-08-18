@@ -3,7 +3,7 @@ Webhook monitoring Discord's API for status updates
 
 ![image](https://user-images.githubusercontent.com/57044042/163442502-a0b9f3db-7a33-4352-90ee-9dd23f22ea44.png)
 ## Requiremments
-- Node.js 16+ https://nodejs.org
+- Node.js 18+ https://nodejs.org
 - pnpm (`corepack enable` + `corepack prepare pnpm@latest --activate`)
 
 ## Running
