@@ -76,7 +76,9 @@ async function updateIncident(incident: StatusPageIncident, messageID?: string) 
 	const embed = embedFromIncident(incident);
 	try {
 		const message = await (messageID
+			// @ts-expect-error
 			? hook.editMessage(messageID, { embeds: [embed] })
+			// @ts-expect-error
 			: hook.send({ embeds: [embed] }));
 		console.debug(`setting: ${incident.id} to message: ${message.id}`);
 		await incidentData.set(incident.id, {

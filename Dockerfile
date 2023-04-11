@@ -1,11 +1,10 @@
 FROM        node:lts-alpine
 WORKDIR     /app
 
-RUN         apk add --no-cache git
-
-COPY        package.json yarn.lock ./
-RUN         yarn --frozen-lockfile
-RUN         yarn build
+COPY        package.json pnpm-lock.yaml ./
+RUN         corepack enable && corepack prepare pnpm@latest --activate
+RUN         pnpm install --frozen-lockfile
+RUN         pnpm build
 COPY        . .
 
-CMD         yarn start
+CMD         pnpm start
