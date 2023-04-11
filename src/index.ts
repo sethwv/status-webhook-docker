@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: '/config/.env' });
 import { WebhookClient, EmbedBuilder } from 'discord.js';
 // fuck you typescript for forcing me to still use this
 import fetch from 'node-fetch';
@@ -14,7 +14,7 @@ import {
 	EMBED_COLOR_BLACK,
 	API_BASE,
 } from './constants';
-const incidentData: Keyv<DataEntry> = new Keyv(`sqlite://data/data.sqlite`);
+const incidentData: Keyv<DataEntry> = new Keyv(`sqlite:///config/data.sqlite`);
 
 interface DataEntry {
 	messageID: string;
@@ -26,9 +26,9 @@ interface DataEntry {
 const hook = new WebhookClient({ url: process.env.DISCORD_WEBHOOK! });
 console.info(`Starting with webhook ${hook.id}`);
 
-if (!existsSync('./data')) {
+if (!existsSync('/config')) {
 	console.info('Creating Database file');
-    mkdirSync('./data');
+    mkdirSync('/config');
 	appendFile('data.sqlite', '', function (err) {
 		if (err) throw err;
 	});
